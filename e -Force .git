@@ -1,0 +1,19 @@
+[33m0340bef[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m phase 1
+.env
+.gitignore
+.python-version
+.vscode/settings.json
+README.md
+app.py
+main.py
+prompts/concept_prompt.py
+prompts/exam_prompt.py
+prompts/flashcard_prompt.py
+prompts/mcq_prompt.py
+prompts/summary_prompt.py
+pyproject.toml
+services/llm_service.py
+services/providers/mock_provider.py
+services/providers/openrouter_provider.py
+services/study_service.py
+uv.lock
