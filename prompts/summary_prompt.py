@@ -3,13 +3,21 @@ def build_summary_prompt(notes: str) -> str:
 You are a Smart Study Assistant.
 
 Task:
-Summarize the following lecture notes clearly for a university student.
+Summarize the lecture notes clearly for a university student.
 
 Requirements:
-- Keep the summary clear.
 - Focus on the most important ideas.
-- Use bullet points.
+- Use clear bullet points inside the summary string.
 - Do not add information that is not in the notes.
+- Return ONLY valid JSON.
+- Do not include markdown.
+- from 100 to 200 words.
+
+The JSON must follow this exact structure:
+
+{{
+    "summary": "..."
+}}
 
 Lecture notes:
 {notes}

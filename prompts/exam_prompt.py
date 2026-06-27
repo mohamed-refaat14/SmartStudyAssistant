@@ -3,14 +3,26 @@ def build_exam_prompt(notes: str) -> str:
 You are a Smart Study Assistant.
 
 Task:
-Create a short mock exam from the lecture notes.
+Create a mock exam from the lecture notes.
 
 Requirements:
-- Include 3 short-answer questions.
-- Include 3 multiple-choice questions.
-- Include 2 true/false questions.
-- Add an answer key at the end.
+- Generate 5 exam questions.
+- Each question must have a model answer.
+- Questions should test understanding, not memorization only.
 - Do not add information that is not in the notes.
+- Return ONLY valid JSON.
+- Do not include markdown.
+
+The JSON must follow this exact structure:
+
+{{
+    "questions": [
+        {{
+            "question": "...",
+            "answer": "..."
+        }}
+    ]
+}}
 
 Lecture notes:
 {notes}

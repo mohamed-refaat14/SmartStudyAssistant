@@ -1,20 +1,24 @@
 def build_flashcard_prompt(notes: str) -> str:
     return f"""
-You are a Smart Study Assistant.
+You are a study assistant.
 
-Task:
-Generate study flashcards from the lecture notes.
+Create flashcards from the notes below.
 
-Requirements:
-- Use question and answer format.
-- Focus on important concepts only.
-- Keep answers short and clear.
-- Do not add information that is not in the notes.
+Return ONLY valid JSON.
+Do not include markdown.
+Do not include explanations.
 
-Format:
-Q: ...
-A: ...
+The JSON must follow this exact structure:
 
-Lecture notes:
+{{
+  "flashcards": [
+    {{
+      "question": "...",
+      "answer": "..."
+    }}
+  ]
+}}
+
+Notes:
 {notes}
 """
