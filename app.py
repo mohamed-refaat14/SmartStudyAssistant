@@ -1,5 +1,6 @@
 import streamlit as st
 
+from services.document_service import extract_pdf_text
 from services.study_service import (
     generate_concepts,
     generate_flashcards,
@@ -7,6 +8,7 @@ from services.study_service import (
     generate_mock_exam,
     generate_summary,
 )
+
 
 st.set_page_config(
     page_title="Smart Study Assistant",
@@ -16,13 +18,48 @@ st.set_page_config(
 
 st.title("Smart Study Assistant")
 
-st.write("Paste your lecture notes, then generate study materials.")
+st.write(
+    "Paste your lecture notes, upload a PDF, or use both to generate "
+    "study materials."
+)
 
 notes = st.text_area(
     "Lecture notes",
     height=300,
     placeholder="Paste your lecture notes here...",
 )
+
+uploaded_file = st.file_uploader(
+    "Upload lecture PDF",
+    type=["pdf"],
+)
+
+
+def build_notes_input(typed_notes, pdf_file) -> str:
+    typed_notes = typed_notes.strip()
+    pdf_text = ""
+
+    if pdf_file is not None:
+        pdf_text = extract_pdf_text(pdf_file)
+
+    if typed_notes and pdf_text:
+        return (
+            "--- Typed Notes ---\n\n"
+            f"{typed_notes}\n\n"
+            "--- Uploaded PDF ---\n\n"
+            f"{pdf_text}"
+        )
+
+    if typed_notes:
+        return typed_notes
+
+    if pdf_text:
+        return pdf_text
+
+    raise ValueError(
+        "Please paste lecture notes or upload a PDF first."
+    )
+
 
 col1, col2 = st.columns(2)
 
@@ -36,36 +73,30 @@ with col2:
     mcq_button = st.button("Generate MCQs")
 
 
-def validate_notes() -> bool:
-    if not notes.strip():
-        st.warning("Please paste lecture notes first.")
-        return False
-    return True
-
-
 def display_summary() -> None:
-    if not validate_notes():
-        return
-
     try:
+        combined_notes = build_notes_input(notes, uploaded_file)
+
         with st.spinner("Generating summary..."):
-            result = generate_summary(notes)
+            result = generate_summary(combined_notes)
 
         st.subheader("Summary")
         st.markdown(result.summary)
 
-    except Exception as e:
+    except ValueError as error:
+        st.warning(str(error))
+
+    except Exception as error:
         st.error("Something went wrong.")
-        st.exception(e)
+        st.exception(error)
 
 
 def display_flashcards() -> None:
-    if not validate_notes():
-        return
-
     try:
+        combined_notes = build_notes_input(notes, uploaded_file)
+
         with st.spinner("Generating flashcards..."):
-            result = generate_flashcards(notes)
+            result = generate_flashcards(combined_notes)
 
         st.subheader("Flashcards")
 
@@ -75,18 +106,20 @@ def display_flashcards() -> None:
             st.write(f"**Answer:** {card.answer}")
             st.divider()
 
-    except Exception as e:
+    except ValueError as error:
+        st.warning(str(error))
+
+    except Exception as error:
         st.error("Something went wrong.")
-        st.exception(e)
+        st.exception(error)
 
 
 def display_mcqs() -> None:
-    if not validate_notes():
-        return
-
     try:
+        combined_notes = build_notes_input(notes, uploaded_file)
+
         with st.spinner("Generating MCQs..."):
-            result = generate_mcqs(notes)
+            result = generate_mcqs(combined_notes)
 
         st.subheader("MCQs")
 
@@ -105,18 +138,20 @@ def display_mcqs() -> None:
 
             st.divider()
 
-    except Exception as e:
+    except ValueError as error:
+        st.warning(str(error))
+
+    except Exception as error:
         st.error("Something went wrong.")
-        st.exception(e)
+        st.exception(error)
 
 
 def display_concepts() -> None:
-    if not validate_notes():
-        return
-
     try:
+        combined_notes = build_notes_input(notes, uploaded_file)
+
         with st.spinner("Extracting concepts..."):
-            result = generate_concepts(notes)
+            result = generate_concepts(combined_notes)
 
         st.subheader("Concepts")
 
@@ -125,18 +160,20 @@ def display_concepts() -> None:
             st.write(concept.explanation)
             st.divider()
 
-    except Exception as e:
+    except ValueError as error:
+        st.warning(str(error))
+
+    except Exception as error:
         st.error("Something went wrong.")
-        st.exception(e)
+        st.exception(error)
 
 
 def display_mock_exam() -> None:
-    if not validate_notes():
-        return
-
     try:
+        combined_notes = build_notes_input(notes, uploaded_file)
+
         with st.spinner("Generating mock exam..."):
-            result = generate_mock_exam(notes)
+            result = generate_mock_exam(combined_notes)
 
         st.subheader("Mock Exam")
 
@@ -149,9 +186,12 @@ def display_mock_exam() -> None:
 
             st.divider()
 
-    except Exception as e:
+    except ValueError as error:
+        st.warning(str(error))
+
+    except Exception as error:
         st.error("Something went wrong.")
-        st.exception(e)
+        st.exception(error)
 
 
 if summary_button:
