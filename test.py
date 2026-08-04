@@ -2,7 +2,7 @@ import json
 from models.flashcard import FlashcardResponse
 
 
-response = '''
+response = """
 {
   "flashcards": [
     {
@@ -15,7 +15,7 @@ response = '''
     }
   ]
 }
-'''
+"""
 
 data = json.loads(response)
 

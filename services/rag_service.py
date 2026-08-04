@@ -41,6 +41,7 @@ def answer_document_question(
     question: str,
     chunk_records: list[dict],
     top_k: int = 3,
+    minimum_score: float = 0.25,
 ) -> tuple[str, list[dict]]:
     question = question.strip()
 
@@ -58,12 +59,24 @@ def answer_document_question(
         top_k=top_k,
     )
 
+    relevant_chunks = [
+        record
+        for record in retrieved_chunks
+        if record["score"] >= minimum_score
+    ]
+
+    if not relevant_chunks:
+        return (
+            "I could not find enough information in the uploaded document.",
+            [],
+        )
+
     context = "\n\n".join(
         (
             f"[Chunk {record['chunk_index'] + 1}]\n"
             f"{record['text']}"
         )
-        for record in retrieved_chunks
+        for record in relevant_chunks
     )
 
     prompt = build_rag_prompt(
@@ -73,4 +86,4 @@ def answer_document_question(
 
     answer = generate_response(prompt)
 
-    return answer, retrieved_chunks
+    return answer, relevant_chunks

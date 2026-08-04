@@ -7,6 +7,7 @@ load_dotenv()
 provider = os.getenv("LLM_PROVIDER", "mock").lower()
 print(f"Provider = {provider}")
 
+
 def ask_llm(prompt: str) -> str:
     if not prompt.strip():
         raise ValueError("Prompt cannot be empty.")

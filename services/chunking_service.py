@@ -25,4 +25,3 @@ def split_text(
         chunks.append(" ".join(chunk_words))
 
     return chunks
-

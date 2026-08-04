@@ -30,10 +30,7 @@ if "rag_document_name" not in st.session_state:
 
 st.title("Smart Study Assistant")
 
-st.write(
-    "Paste lecture notes, upload a PDF, or use both to generate "
-    "study materials."
-)
+st.write("Paste lecture notes, upload a PDF, or use both to generate study materials.")
 
 
 notes = st.text_area(
@@ -73,9 +70,7 @@ def build_notes_input(
     if pdf_text:
         return pdf_text
 
-    raise ValueError(
-        "Please paste lecture notes or upload a PDF first."
-    )
+    raise ValueError("Please paste lecture notes or upload a PDF first.")
 
 
 col1, col2 = st.columns(2)
@@ -159,9 +154,7 @@ def display_mcqs() -> None:
             st.markdown(f"### Question {index}")
             st.write(mcq.question)
 
-            for choice_index, choice in enumerate(
-                mcq.choices
-            ):
+            for choice_index, choice in enumerate(mcq.choices):
                 if choice_index == mcq.correct_answer_index:
                     st.success(f"✅ {choice}")
                 else:
@@ -260,10 +253,7 @@ st.divider()
 
 st.header("Ask Your Document")
 
-st.write(
-    "Upload a PDF, index it, then ask questions based only "
-    "on its content."
-)
+st.write("Upload a PDF, index it, then ask questions based only on its content.")
 
 rag_pdf = st.file_uploader(
     "Upload a PDF for document questions",
@@ -279,9 +269,7 @@ if index_button:
 
     else:
         try:
-            with st.spinner(
-                "Extracting and indexing document..."
-            ):
+            with st.spinner("Extracting and indexing document..."):
                 document_text = extract_pdf_text(rag_pdf)
 
                 chunk_records = build_document_index(
@@ -290,33 +278,21 @@ if index_button:
                     overlap=50,
                 )
 
-                st.session_state.rag_chunk_records = (
-                    chunk_records
-                )
-                st.session_state.rag_document_name = (
-                    rag_pdf.name
-                )
+                st.session_state.rag_chunk_records = chunk_records
+                st.session_state.rag_document_name = rag_pdf.name
 
-            st.success(
-                f"Indexed {len(chunk_records)} chunks "
-                f"from {rag_pdf.name}."
-            )
+            st.success(f"Indexed {len(chunk_records)} chunks from {rag_pdf.name}.")
 
         except ValueError as error:
             st.warning(str(error))
 
         except Exception as error:
-            st.error(
-                "The document could not be indexed."
-            )
+            st.error("The document could not be indexed.")
             st.exception(error)
 
 
 if st.session_state.rag_chunk_records:
-    st.info(
-        "Current indexed document: "
-        f"{st.session_state.rag_document_name}"
-    )
+    st.info(f"Current indexed document: {st.session_state.rag_document_name}")
 
     rag_question = st.text_input(
         "Ask a question about the uploaded document",
@@ -327,18 +303,11 @@ if st.session_state.rag_chunk_records:
 
     if ask_button:
         try:
-            with st.spinner(
-                "Retrieving relevant information..."
-            ):
-                answer, sources = (
-                    answer_document_question(
-                        question=rag_question,
-                        chunk_records=(
-                            st.session_state
-                            .rag_chunk_records
-                        ),
-                        top_k=3,
-                    )
+            with st.spinner("Retrieving relevant information..."):
+                answer, sources = answer_document_question(
+                    question=rag_question,
+                    chunk_records=(st.session_state.rag_chunk_records),
+                    top_k=3,
                 )
 
             st.subheader("Answer")
@@ -350,15 +319,10 @@ if st.session_state.rag_chunk_records:
                     start=1,
                 ):
                     st.markdown(
-                        f"### Source {index} — "
-                        f"Chunk "
-                        f"{source['chunk_index'] + 1}"
+                        f"### Source {index} — Chunk {source['chunk_index'] + 1}"
                     )
 
-                    st.write(
-                        "Similarity score: "
-                        f"{source['score']:.4f}"
-                    )
+                    st.write(f"Similarity score: {source['score']:.4f}")
 
                     st.write(source["text"])
                     st.divider()
@@ -367,7 +331,5 @@ if st.session_state.rag_chunk_records:
             st.warning(str(error))
 
         except Exception as error:
-            st.error(
-                "The question could not be answered."
-            )
+            st.error("The question could not be answered.")
             st.exception(error)

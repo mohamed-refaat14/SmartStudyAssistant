@@ -24,7 +24,9 @@ def _validate_notes(notes: str) -> None:
         raise ValueError("Lecture notes cannot be empty.")
 
 
-def _generate_structured_from_notes(notes: str, prompt_builder, response_model: type[T]) -> T:
+def _generate_structured_from_notes(
+    notes: str, prompt_builder, response_model: type[T]
+) -> T:
     _validate_notes(notes)
 
     prompt = prompt_builder(notes)
@@ -39,7 +41,9 @@ def _generate_structured_from_notes(notes: str, prompt_builder, response_model: 
         raise ValueError("LLM returned invalid JSON")
 
     except ValidationError:
-        raise ValueError(f"LLM returned JSON, but it does not match {response_model.__name__}")
+        raise ValueError(
+            f"LLM returned JSON, but it does not match {response_model.__name__}"
+        )
 
 
 def generate_summary(notes: str) -> SummaryResponse:
@@ -51,7 +55,9 @@ def generate_concepts(notes: str) -> ConceptResponse:
 
 
 def generate_flashcards(notes: str) -> FlashcardResponse:
-    return _generate_structured_from_notes(notes, build_flashcard_prompt, FlashcardResponse)
+    return _generate_structured_from_notes(
+        notes, build_flashcard_prompt, FlashcardResponse
+    )
 
 
 def generate_mcqs(notes: str) -> MCQResponse:
