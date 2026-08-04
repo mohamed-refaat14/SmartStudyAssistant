@@ -1,41 +1,69 @@
+
+
 from prompts.rag_prompt import build_rag_prompt
 from services.chunking_service import split_text
 from services.embedding_service import embed_text, embed_texts
 from services.llm_service import ask_llm as generate_response
 from services.retrieval_service import retrieve_top_k
 
-
 def build_document_index(
-    document_text: str,
+    pages: list[dict],
+    filename: str,
     chunk_size: int = 300,
     overlap: int = 50,
 ) -> list[dict]:
-    chunks = split_text(
-        text=document_text,
-        chunk_size=chunk_size,
-        overlap=overlap,
-    )
+    filename = filename.strip()
 
-    if not chunks:
-        raise ValueError("The document did not produce any chunks.")
+    if not filename:
+        raise ValueError(
+            "The document filename cannot be empty."
+        )
 
-    embeddings = embed_texts(chunks)
+    if not pages:
+        raise ValueError(
+            "The document does not contain any pages."
+        )
 
     chunk_records = []
 
-    for index, (chunk, embedding) in enumerate(
-        zip(chunks, embeddings)
-    ):
-        chunk_records.append(
-            {
-                "text": chunk,
-                "embedding": embedding,
-                "chunk_index": index,
-            }
+    for page in pages:
+        page_number = page["page_number"]
+        page_text = page["text"]
+
+        page_chunks = split_text(
+            text=page_text,
+            chunk_size=chunk_size,
+            overlap=overlap,
         )
 
-    return chunk_records
+        for chunk in page_chunks:
+            chunk_records.append(
+                {
+                    "text": chunk,
+                    "page_number": page_number,
+                    "filename": filename,
+                }
+            )
 
+    if not chunk_records:
+        raise ValueError(
+            "The document did not produce any chunks."
+        )
+
+    chunk_texts = [
+        record["text"]
+        for record in chunk_records
+    ]
+
+    embeddings = embed_texts(chunk_texts)
+
+    for index, (record, embedding) in enumerate(
+        zip(chunk_records, embeddings)
+    ):
+        record["chunk_index"] = index
+        record["embedding"] = embedding
+
+    return chunk_records
 
 def answer_document_question(
     question: str,
